@@ -18,7 +18,6 @@ def DoPlots(epochs, batch_size_list, lr_list):
 
             time = np.load(str(epochs) + 'epoch_' + str(batch_size) + 'batch_' + str(lr) + 'lr_time.npy')
 
-
             plt.figure(0)
             plt.subplot(311)
             fig1.plot(current_model_history['val_loss'], label='batch='+str(batch_size)+' lr='+str(lr))
@@ -52,7 +51,7 @@ def DoPlots(epochs, batch_size_list, lr_list):
     fig3.ylabel('Time')
 
     plt.tight_layout()
-    plt.savefig('out_comparison.jpg')
+    plt.savefig('out_comparison_batch.jpg')
     plt.show()
 
 
@@ -107,4 +106,58 @@ def DoPlots_activations(epochs, activation_list, pooling_list):
 
     plt.tight_layout()
     plt.savefig('out_comparison_activation.jpg')
+    plt.show()
+
+
+def DoPlots_optimizers(epochs, optimizer_name_list, loss_function_list):
+
+    fig1 = plt
+    fig2 = plt
+    fig3 = plt
+
+    i = 1
+
+    for optimizer_name in optimizer_name_list:
+        for loss_function in loss_function_list:
+            history_file = open(str(epochs) + 'epoch_' + optimizer_name + '_optimizer_' + loss_function + '_loss_function_history.pickl', 'rb')
+            current_model_history = pickle.load(history_file)
+            history_file.close()
+
+            time = np.load(str(epochs) + 'epoch_' + optimizer_name + '_optimizer_' + loss_function + '_loss_function_time.npy')
+
+
+            plt.figure(0)
+            plt.subplot(311)
+            fig1.plot(current_model_history['val_loss'])
+
+            # plt.figure(2)
+            plt.subplot(312)
+            fig2.plot(current_model_history['val_accuracy'])
+
+            plt.subplot(313)
+            fig3.plot(i, time, marker='o', label='optimizer='+optimizer_name+' loss_function='+loss_function)
+            i = i + 1
+
+    plt.figure(0)
+    plt.subplot(311)
+    # fig1.legend()
+    fig1.title('Validation loss')
+    fig1.xlabel('Epochs')
+    fig1.ylabel('loss')
+    # fig1.axis([0, 10, 0, 1])
+
+    plt.subplot(312)
+    # fig2.legend()
+    fig2.title('validation accuracy')
+    fig2.xlabel('Epochs')
+    fig2.ylabel('accuracy')
+
+    plt.subplot(313)
+    fig3.legend()
+    fig3.title('Time to train model')
+    fig3.xlabel('Test run')
+    fig3.ylabel('Time')
+
+    plt.tight_layout()
+    plt.savefig('out_comparison_optimizer.jpg')
     plt.show()

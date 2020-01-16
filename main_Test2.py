@@ -7,33 +7,36 @@ import numpy as np
 import seaborn as sns
 
 
-data_set_1 = DataSet(data_set='german', number_of_labels=5, number_of_images=200, grayscale=False, normalize=False, contrast=False)
+data_set_1 = DataSet(data_set='german', number_of_labels=10, number_of_images=200, grayscale=True, normalize=True, contrast=True)
 
-data_set_list = [data_set_1, data_set_1]
+epochs = 21
+# epochs = 20
 
-epochs = 10
-batch_size_list = [5, 10]
-lr_list = [0.01, 0.0001]
+activation = 'relu'
+pooling = 'averagepooling'
+# optimizer = Adam(lr=0.0001)
+loss_function = 'categorical_crossentropy'
 
+# parameters to test
+# batch_size_list = [5, 10, 20]
+batch_size_list = [10]
+lr_list = [0.1, 0.01, 0.001]
 
-drop_out = [0, 0.1, 0.2, 0.3]
-activation = ['relu', 'softmax']
-optimizers = ['Adam', 'lol']
-pooling = ['maxpooling']
-
-
+start_time_total = time.time()
 for batch_size in batch_size_list:
     for lr in lr_list:
+        print('activation: '+activation + ' pooling: ' + pooling)
         print('batch_size: ' + str(batch_size) + ' lr: '+ str(lr))
+
         start_time = time.time()
 
         # creat model
         output_num = data_set_1.number_of_labels
         my_model = ClassModel(conv_num=3, kernel_size=(3, 3), filter_number=16, dense_num=5, conv_dropout=0.2,
-                                dense_dropout=0.3,
-                                activation='relu', pool_size=(2, 2), hidden_num_units=600, output_layer_num=output_num)
+                              dense_dropout=0.3, pooling=pooling, activation=activation, pool_size=(2, 2),
+                              hidden_num_units=600, output_layer_num=output_num)
 
-        my_model.model.compile(loss='categorical_crossentropy', optimizer=Adam(lr=lr), metrics=['accuracy'])
+        my_model.model.compile(loss=loss_function, optimizer=sgd(lr=lr), metrics=['accuracy'])
 
         current_model = my_model.model
 
@@ -59,3 +62,7 @@ for batch_size in batch_size_list:
 
 
 DoPlots(epochs, batch_size_list, lr_list)
+
+run_time_total = (time.time() - start_time_total) /60
+
+print('total time: ' + str(run_time_total) + 'min')

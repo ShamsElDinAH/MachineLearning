@@ -1,13 +1,13 @@
 # from PIL import Image
 import glob
 import scipy.io as sio
-import cv2
 from image_augmentation_function import *
 import os
 import pandas as pd
 import numpy as np
 import keras
 from sklearn import preprocessing
+import seaborn as sns
 
 german_data_dir = os.path.abspath('GTSRB_Final_Training_Images/GTSRB/Final_Training/Images')
 swedish_data_dir = 'code'
@@ -15,13 +15,14 @@ swedish_data_dir = 'code'
 
 class DataSet:
     def __init__(self, data_set, number_of_labels=None, number_of_images=None, grayscale=False,
-                 normalize=False, contrast=False):
+                 normalize=False, contrast=False, augment_dataset=False):
         self.data_set = data_set
         self.number_of_labels = number_of_labels
         self.number_of_images = number_of_images
         self.grayscale = grayscale
         self.normalize = normalize
         self.contrast = contrast
+        self.augment_dataset = augment_dataset
 
         # Initiate stuff
         self.swedish_data_encoder = preprocessing.LabelEncoder()
@@ -74,13 +75,21 @@ class DataSet:
             inner_dir = os.path.join(german_data_dir, dir)
             csv_file = pd.read_csv(os.path.join(inner_dir, "GT-" + dir + '.csv'), sep=';')
 
-            image_number = csv_file.Filename.size
-            # times_to_augemnt = int(2000 / image_number)
-
             if self.number_of_images:
                 cvs_file_to_use = csv_file[0:self.number_of_images]
             else:
                 cvs_file_to_use = csv_file
+
+            if self.augment_dataset:
+                image_number = cvs_file_to_use.Filename.size
+                ratio = self.number_of_images / image_number
+                times_to_augemnt = int(math.ceil(self.number_of_images / image_number))
+                total_augmented_images = image_number * (ratio-1)
+            else:
+                times_to_augemnt = 0
+                total_augmented_images = 0
+
+            augment_counter = 0
 
             for row in cvs_file_to_use.iterrows():
                 img_path = os.path.join(inner_dir, row[1].Filename)
@@ -99,21 +108,31 @@ class DataSet:
                         clahe = cv2.createCLAHE(clipLimit=3.0)  # clipLimit=2.0, tileGridSize=(8, 8))
                         img = clahe.apply(img)
                     # cv2.imshow('cont', cont)
+                    img = cv2.merge((img, img, img))
+                    # img = tf.expand_dims(img, 2)
 
                 list_images.append(img)
                 output.append(row[1].ClassId)
 
-                # for augemnt_i in range(times_to_augemnt):
-                #     # augment image and resize
-                #     rotated_img = rotate_image_randomly(img)  # This should also resize the image
-                #
-                #     list_images.append(rotated_img)
-                #     output.append(row[1].ClassId)
-                #     print('augmenting:', row[1].ClassId)
+                if times_to_augemnt > 1 and augment_counter < total_augmented_images:
+                    for augemnt_i in range(times_to_augemnt):
+                        # augment image and resize
+                        rotated_img = rotate_image_randomly(img)  # This should also resize the image
+
+                        list_images.append(rotated_img)
+                        output.append(row[1].ClassId)
+                        print('augmenting:', row[1].ClassId)
+                        augment_counter = augment_counter + 1
 
                 self.dataset_images = np.stack(list_images)
                 self. dataset_labels_asarray = output
                 self.dataset_labels = keras.utils.np_utils.to_categorical(output)
+
+        # fig = sns.distplot(output, kde=False, bins=43, hist=True, hist_kws=dict(edgecolor="black", linewidth=2))
+        # fig.set(title="Traffic signs frequency graph",
+        #         xlabel="ClassId",
+        #         ylabel="Frequency")
+        # plt.show()
 
     def import_swedish_dataset(self):
         global swedish_data_dir

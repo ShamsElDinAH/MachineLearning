@@ -6,7 +6,6 @@ import time
 import numpy as np
 import seaborn as sns
 
-# this is the first test to see how GIthub Wokrs
 
 data_set_1 = DataSet(data_set='german', number_of_labels=5, number_of_images=200, grayscale=False, normalize=False, contrast=False)
 

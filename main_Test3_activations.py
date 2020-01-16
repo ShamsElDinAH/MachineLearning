@@ -7,23 +7,19 @@ import numpy as np
 import seaborn as sns
 
 
-data_set_1 = DataSet(data_set='german', number_of_labels=5, number_of_images=200, grayscale=False, normalize=False, contrast=False)
+data_set_1 = DataSet(data_set='german', number_of_labels=10, number_of_images=200, grayscale=True, normalize=True, contrast=True)
 
-data_set_list = [data_set_1, data_set_1]
+epochs = 20
+batch_size= 10
+lr = 0.0001
+optimizer = Adam(lr=0.0001)
+loss_function = 'categorical_crossentropy'
 
-epochs = 10
-batch_size_list = [5, 10]
-lr_list = [0.01, 0.0001]
-
-
-drop_out = [0, 0.1, 0.2, 0.3]
-activation_list = ['relu', 'sigmoid', 'tanh']
-optimizers = ['Adam', 'lol']
+# parameters to test
+activation_list = ['relu', 'tanh', 'sigmoid']
 pooling_list = ['maxpooling', 'averagepooling']
 
-# activation_list = ['sigmoid']
-# pooling_list = ['averagepooling']
-
+start_time_total = time.time()
 for activation in activation_list:
     for pooling in pooling_list:
         print('activation: '+activation + ' pooling: ' + pooling)
@@ -38,7 +34,7 @@ for activation in activation_list:
                               dense_dropout=0.3, activation=activation, pooling=pooling, pool_size=(2, 2),
                               hidden_num_units=600, output_layer_num=output_num)
 
-        my_model.model.compile(loss='categorical_crossentropy', optimizer=Adam(lr=lr), metrics=['accuracy'])
+        my_model.model.compile(loss=loss_function, optimizer=optimizer, metrics=['accuracy'])
 
         current_model = my_model.model
 
@@ -64,3 +60,7 @@ for activation in activation_list:
 
 
 DoPlots_activations(epochs, activation_list, pooling_list)
+
+run_time_total = (time.time() - start_time_total) /60
+
+print(run_time_total + 'min')

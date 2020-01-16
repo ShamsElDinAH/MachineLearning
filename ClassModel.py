@@ -10,7 +10,8 @@ import matplotlib.pyplot as plt
 from keras.layers import Dense, Dropout, Flatten, Input
 from keras.layers import Conv2D, MaxPooling2D, AveragePooling2D
 from keras.layers import BatchNormalization
-from keras.optimizers import Adam
+from keras.optimizers import Adam, adagrad, sgd
+from keras_adabound import AdaBound
 from keras.models import Sequential
 
 
@@ -30,7 +31,7 @@ class ClassModel:
             # Conv2D(64, (3, 3), activation='relu', padding='same'),
             # BatchNormalization(),
             if i == 1:
-                self.model.add(Conv2D(filter_number*2**i, kernel_size, activation=activation, input_shape=(64, 64, 3), padding='same'))
+                self.model.add(Conv2D(filter_number*2**i, kernel_size, activation=activation, input_shape=(64, 64, 3), padding='same')) # input_shape=(64, 64, 3)
                 self.model.add(BatchNormalization())
             else:
                 self.model.add(Conv2D(filter_number*2**i, kernel_size, activation=activation, padding='same'))
