@@ -93,6 +93,7 @@ class DataSet:
 
             for row in cvs_file_to_use.iterrows():
                 img_path = os.path.join(inner_dir, row[1].Filename)
+                print(img_path)
                 img = imread(img_path)
                 img = img[row[1]['Roi.X1']:row[1]['Roi.X2'], row[1]['Roi.Y1']:row[1]['Roi.Y2'], :]
                 img = resize_cv(img)

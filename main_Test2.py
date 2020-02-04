@@ -9,7 +9,7 @@ import seaborn as sns
 
 data_set_1 = DataSet(data_set='german', number_of_labels=10, number_of_images=200, grayscale=True, normalize=True, contrast=True)
 
-epochs = 21
+epochs = 20
 # epochs = 20
 
 activation = 'relu'
@@ -18,9 +18,9 @@ pooling = 'averagepooling'
 loss_function = 'categorical_crossentropy'
 
 # parameters to test
-# batch_size_list = [5, 10, 20]
-batch_size_list = [10]
-lr_list = [0.1, 0.01, 0.001]
+batch_size_list = [5, 10, 20]
+# batch_size_list = [10]
+lr_list = [0.001, 0.0001]
 
 start_time_total = time.time()
 for batch_size in batch_size_list:

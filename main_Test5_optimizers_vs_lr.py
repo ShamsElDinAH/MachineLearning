@@ -22,7 +22,7 @@ loss_function = 'categorical_crossentropy'
 # parameters to test
 # optimizer_list =  [Adam(lr=lr), adagrad(lr=lr), sgd(lr=lr)] These must be tested one by one
 # optimizer_name_list = ['Adam', 'adagrad', 'sgd']
-
+optimizer_name = 'sgd'
 learning_rate_list = [0.1, 0.01, 0.001, 0.0001]
 
 start_time_total = time.time()
@@ -95,19 +95,19 @@ for learning_rate in learning_rate_list:
 
     plt.figure(0)
     plt.subplot(311)
-    fig1.plot(current_model_history['val_loss'])
+    fig1.plot(current_model_history['val_loss'], label='optimizer='+optimizer_name+' lr='+str(learning_rate))
 
     # plt.figure(2)
     plt.subplot(312)
     fig2.plot(current_model_history['val_accuracy'])
 
     plt.subplot(313)
-    fig3.plot(i, time, marker='o', label='optimizer='+optimizer_name+' lr='+str(learning_rate))
+    fig3.plot(i, time, marker='o')
     i = i + 1
 
 plt.figure(0)
 plt.subplot(311)
-# fig1.legend()
+fig1.legend(bbox_to_anchor=(1.05, 1.0), loc='upper left',  borderaxespad=0.)
 fig1.title('Validation loss')
 fig1.xlabel('Epochs')
 fig1.ylabel('loss')
@@ -120,7 +120,7 @@ fig2.xlabel('Epochs')
 fig2.ylabel('accuracy')
 
 plt.subplot(313)
-fig3.legend()
+# fig3.legend()
 fig3.title('Time to train model')
 fig3.xlabel('Test run')
 fig3.ylabel('Time')
